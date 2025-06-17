@@ -1,56 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto }  from './dto/update-user.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { User, Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-    private users: { id: number; name: string; age: number; sex: string }[] = [];
-    private CounterID = 1;
+    constructor(private prisma: PrismaService) {}
 
-    create(createUserDto: CreateUserDto) {
-        const newUser = {
-            id: this.CounterID++,
-            ...createUserDto,
-        };
-        this.users.push(newUser);
-        return newUser;
-   }
-
-    findAll() {
-        return this.users;
+    async createUser(data: Prisma.UserCreateInput) {
+        return this.prisma.user.create({ data });
     }
 
-    findOne(id: number) {
-        const user = this.users.find((user) => user.id === id);
-        if(!user) {
-            return null;
-        }
-        return user;
+    async findAllUsers() {
+        return this.prisma.user.findMany();
     }
 
-    update(id: number, updateUserDto: UpdateUserDto){
-        const userIndex = this.users.findIndex(user => user.id === id);
-        if (userIndex === -1) {
-            return {message: "user not found"};
-        }
-
-        this.users[userIndex] = { ...this.users[userIndex], ...updateUserDto };
-        return this.users[userIndex];
+    async findUserById(id: number) {
+        return this.prisma.user.findUnique({ where: { id } });
     }
 
-    delete(id: number) {
-        const userIndex = this.users.findIndex(user => user.id === id);
-        if (userIndex === -1)   return null;
-        this.users.splice(userIndex, 1);
+    async updateUser(id: number, data: Prisma.UserUpdateInput) {
+        return this.prisma.user.update({ where: { id }, data });
+    }
 
-        this.users = this.users.map((user, index)=>({
-            ...user,
-            id: index + 1 // Resetting IDs after deletion to maintain sequential IDs
-        }));
-
-        this.CounterID = this.users.length > 0 ? this.users.length + 1 : 1; // Update CounterID for next user creation
-
-        return { message: 'User deleted successfully' };
-
+    async deleteUser(id: number) {
+        return this.prisma.user.delete({ where: { id } });
     }
 }
