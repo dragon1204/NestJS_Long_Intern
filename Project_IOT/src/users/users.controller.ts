@@ -21,12 +21,12 @@ export class UsersController {
         return this.usersService.createUser(userData);
     }   
 
-    @Put(":id")
+    @Put("update/:id")
     async updateUser(@Param('id') id: string, @Body() userData: any) {
         return this.usersService.updateUser(+id, userData);
     }       
 
-    @Delete(":id")
+    @Delete("delete/:id")
     async deleteUser(@Param('id') id: string) {
         return this.usersService.deleteUser(+id);
     }
