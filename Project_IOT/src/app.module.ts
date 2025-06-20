@@ -8,7 +8,10 @@ import { AuthModule } from './auth/auth.module';
 
 
 @Module({
-  imports: [UsersModule, AuthModule,    ConfigModule.forRoot({
+  imports: [
+    UsersModule, 
+    AuthModule,    
+    ConfigModule.forRoot({
       isGlobal: true
     })],
   controllers: [AppController],

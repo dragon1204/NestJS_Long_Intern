@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Delete, Put, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller('users')
+@UseGuards(AuthGuard('jwt')) // Protect all routes with JWT authentication
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
