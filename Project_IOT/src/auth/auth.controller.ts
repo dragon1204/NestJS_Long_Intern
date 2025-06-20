@@ -11,8 +11,12 @@ export class AuthController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Post("Login")
+    @Post("login")
     async login(@Body() data: {email: string, password: string}) {
+        console.log('Received data:', data.email, data.password);
+        if ( !data.email || !data.password) {
+            throw new Error('Invalid login data');
+        }
         return this.authService.login(data.email, data.password);
     }
 }

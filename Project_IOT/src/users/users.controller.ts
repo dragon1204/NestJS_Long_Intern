@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt')) // Protect all routes with JWT authentication
+@UseGuards(AuthGuard('jwt')) 
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -18,7 +18,7 @@ export class UsersController {
         return this.usersService.findUserById(+id);
     }     
     
-    @Get("find/:email")
+    @Get("find-email/:email")
     async findUserByEmail(@Param('email') email: string) {
         return this.usersService.findUserByEmail(email);
     } 
