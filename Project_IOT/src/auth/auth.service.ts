@@ -18,6 +18,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
             name: user.name,
+
         };
     }
 
@@ -32,7 +33,7 @@ export class AuthService {
             throw new Error('Email or password is incorrect');
         }
 
-        const payload = { email: user.email, sub: user.id };
+        const payload = { email: user.email, sub: user.id, roles: user.roles };
         const token = this.jwtService.sign(payload);
 
         return {
@@ -41,11 +42,8 @@ export class AuthService {
                 id: user.id,
                 email: user.email,
                 name: user.name,
+                roles: user.roles,
             },
         };
     }
-
-
-    
-
 }
