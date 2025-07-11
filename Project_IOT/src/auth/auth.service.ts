@@ -35,6 +35,8 @@ export class AuthService {
         }
         );
 
+        console.log(user.email, " Singup sucessfully!")
+
         const tokens = await this.getTokens(hashedData);
         return tokens;
     }
@@ -55,7 +57,7 @@ export class AuthService {
         if( !isPasswordValid){
             throw new Error('Email or password is incorrect');
         }
-
+        console.log(user.email, " Login sucessfully!")
         const payload = { email: user.email, sub: user.id, roles: user.roles };
         const token = this.jwtService.sign(payload);
 
