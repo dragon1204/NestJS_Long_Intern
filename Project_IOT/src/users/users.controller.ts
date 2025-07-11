@@ -7,7 +7,7 @@ import { Role } from '@prisma/client';
 
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Use AuthGuard to protect the routes
+@UseGuards( AuthGuard('jwt'), RolesGuard)// Use AuthGuard to protect the routes
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -17,6 +17,7 @@ export class UsersController {
     }
 
 
+  
     @Get("find/:id")
     @Roles(Role.USER)
     async findUserById(@Param('id') id: string) {

@@ -3,8 +3,7 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from 'src/common/guards/roles.guards';
+
 
 
 
@@ -16,11 +15,7 @@ import { RolesGuard } from 'src/common/guards/roles.guards';
   providers: [
     UsersService, 
     PrismaService,
-    { 
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    }
   ],
-  exports: [UsersService, PrismaService],
+  exports: [UsersService],
 })
 export class UsersModule {}

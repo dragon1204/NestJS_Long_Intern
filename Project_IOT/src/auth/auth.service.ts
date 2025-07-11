@@ -39,8 +39,14 @@ export class AuthService {
         return tokens;
     }
 
+
     async login(data: LoginDto) {
-        const user = await this.usersService.findUserByEmail(data.email);
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: data.email,
+            },
+        });
+
         if (!user) {
             throw new Error('Email or password is incorrect');
         }
@@ -64,11 +70,36 @@ export class AuthService {
         };
     }
 
-    async logout(){}
+    // async logout(userId: number){
+    //     await this.prisma.user.updateMany({
+    //         where: {
+    //             id: userId,
+    //             hashedRt : {
+    //                 not: null,
+    //             },
+    //         },
+    //         data: {
+    //             hashedRt: null,
+    //         }
+    //     })
+    //     return true;
+    // }
 
     async refreshTokens(){}
 
-   async getTokens(payload: any){
+    // async updateRtHash(userId: number, rt: string): Promise<void> {
+    //     const hash = await argon.hash(rt);
+    //     await this.prisma.user.update({
+    //         where: {
+    //             id: userId,
+    //         },
+    //         data: {
+    //             hashedRt: hash,
+    //         },
+    //      });
+    // }
+
+    async getTokens(payload: any){
         const [at, rt] = await Promise.all([
             this.jwtService.signAsync(
                 payload, 
