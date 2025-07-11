@@ -1,22 +1,35 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
+import { DataDto, LoginDto } from "./dto/dataDto";
+
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {} 
     
     @Post("register")
-    async register(@Body() data: {email: string, password: string, name?: string, roles?: string[]}) {
+    @HttpCode(HttpStatus.CREATED)
+    async register(@Body() data: DataDto) {
         return this.authService.register(data);
     }
 
     @HttpCode(HttpStatus.OK)
     @Post("login")
-    async login(@Body() data: {email: string, password: string}) {
-        console.log('Received data:', data.email, data.password);
-        if ( !data.email || !data.password) {
-            throw new Error('Invalid login data');
-        }
-        return this.authService.login(data.email, data.password);
+    async login(@Body() data: LoginDto) {
+
+        return this.authService.login(data);
     }
+
+    @Post("logout")
+     @HttpCode(HttpStatus.OK)
+    logoutLocal(){
+        return this.authService.logout();
+    }
+
+    @Post("refresh")
+    refreshTokens(){
+        return this.authService.refreshTokens();
+    }
+
 }
+

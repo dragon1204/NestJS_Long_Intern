@@ -2,12 +2,12 @@ import { Controller, Get, Post, Delete, Put, Patch, Param, Body, UseGuards } fro
 import { UsersService } from '../users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enum/role.enum';
 import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Role } from '@prisma/client';
 
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt')) // Use AuthGuard to protect the routes
+@UseGuards(AuthGuard('jwt'), RolesGuard) // Use AuthGuard to protect the routes
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -18,8 +18,7 @@ export class UsersController {
 
 
     @Get("find/:id")
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.USER)
     async findUserById(@Param('id') id: string) {
         return this.usersService.findUserById(+id);
     }     

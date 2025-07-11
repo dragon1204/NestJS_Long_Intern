@@ -3,10 +3,9 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { UsersService } from "src/users/users.service";
 
-@Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy){
-   
 
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt'){
     constructor(private usersService: UsersService) {
         console.log("JwtStrategy initialized");
         const jwtSecret = process.env.JWT_SECRET;
@@ -17,11 +16,10 @@ export class JwtStrategy extends PassportStrategy(Strategy){
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: jwtSecret,
-        });
-        
+        }); 
     }
 
-    async validate(payload: any){
+    async validate( payload: any){
         console.log("Validating JWT payload:", payload);
         const user = await this.usersService.findUserByEmail(payload.email);
 
@@ -31,7 +29,6 @@ export class JwtStrategy extends PassportStrategy(Strategy){
         else{
             console.log("User found: ", user);
         }
-    
         return user;
     }
 }
