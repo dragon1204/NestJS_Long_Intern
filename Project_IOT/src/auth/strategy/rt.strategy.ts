@@ -1,4 +1,5 @@
-import { ConsoleLogger, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -6,8 +7,10 @@ import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-    constructor(private usersService: UsersService) {
-        const rtSecret = process.env.REFRESH_SECRET;
+    constructor(private usersService: UsersService,
+                        configService: ConfigService
+    ) {
+        const rtSecret = configService.get<string>("REFRESH_SECRET");
         if (!rtSecret) {
             throw new Error('JWT_SECRET environment variable is not defined');
         }

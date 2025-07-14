@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PostDto } from './dto/PostDto';
-import { Prisma } from '@prisma/client';
+import { PostDto } from '../common/dto/PostDto';
+
 
 @Injectable()
 export class PostsService {
@@ -11,11 +11,21 @@ export class PostsService {
         return this.prisma.post.findMany();
     }
 
-    async createPosts(data : Prisma.PostCreateInput){
-        return this.prisma.post.create({ data });
+    async createPosts(data : PostDto){
+        return this.prisma.post.create({
+            data : {
+                title: data.title,
+                content: data.content,
+                user: {
+                    connect: {
+                        id: data.UserId,
+                    }
+                }
+            }
+        });
     }
 
-    async updatePosts(id: number, data : Prisma.PostCreateInput){
+    async updatePosts(id: number, data : PostDto){
         return this.prisma.post.update({
             where: {id}, data
         });
@@ -24,5 +34,11 @@ export class PostsService {
     async deletePosts(id: number){
         return this.prisma.post.delete({ where: {id}});
     }
+
+    async listPosts(){
+    return this.prisma.post.findMany();
+}
+
     
 }
+
