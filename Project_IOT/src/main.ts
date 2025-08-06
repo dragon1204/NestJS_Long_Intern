@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { AllExceptionsFilter } from './common/midlleware/allExeptionFilter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.useGlobalFilters(new AllExceptionsFilter());
+    const configService = app.get(ConfigService)
     const config = new DocumentBuilder()
         .setTitle('The first NestJs project')
         .setDescription('The API description')
@@ -15,6 +19,7 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, documentFactory);
     
     app.useGlobalPipes(new ValidationPipe({ transform: true })); // Ensures proper validation and transformation
-    await app.listen(process.env.PORT ?? 3000);
+    const port = configService.get<string>('PORT')
+    await app.listen(port ?? 3000);
 }
 bootstrap();

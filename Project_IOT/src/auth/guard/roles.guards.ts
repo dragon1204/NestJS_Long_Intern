@@ -1,7 +1,7 @@
 
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorator/roles.decorator';
+import { ROLES_KEY } from '../../common/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Injectable()
@@ -13,6 +13,7 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+    
     if (!requiredRoles) {
       return true;
     }
@@ -23,6 +24,16 @@ export class RolesGuard implements CanActivate {
       console.log("Không có user trong request");
       return false;
     }
-    return requiredRoles.some((role) => user.roles?.includes(role));
+
+    const roleHierarchy = {
+      ADMIN : ['ADMIN', 'USER'],
+      USER : ['USER']
+    }
+
+    const userRoles = roleHierarchy[user.role] || [];
+
+    const isValid = requiredRoles.some(role => userRoles.includes(role));
+
+    return isValid;
   }
 }

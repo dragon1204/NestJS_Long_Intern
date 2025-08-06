@@ -1,11 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as bcrypt from 'bcryptjs';
 import { Role } from "@prisma/client";
-import { UserDto } from "../common/dto/userDto";
+import { UserDto } from "../users/dto/user-dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { LoginDto } from "../common/dto/LoginDto";
+import { LoginDto } from "./dto/login-dto.ts";
+import { RegisterDto } from "./dto/register-dto";
+
+
 
 @Injectable()
 export class AuthService {
@@ -17,49 +20,43 @@ export class AuthService {
     
  
 
-    async register(data: UserDto) {
+    async register(data: RegisterDto) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const hashedData = {
             email: data.email,
             password: hashedPassword,
             name: data.name,
-            roles: data.roles || [Role.USER], // Default to USER role if not provided
+            role: data.role ?? Role.USER, // Default to USER role if not provided
         }
 
-        const  user = await this.prisma.user.create({
-            data: {
+        const  user = await this.usersService.createUser(
+            {
                 email: data.email,
                 password: hashedPassword,
                 name: data.name,
-                roles: data.roles || [Role.USER], // Default to USER role if not provided
+                role: data.role ?? Role.USER , // Default to USER role if not provided
             }
-        }
         );
 
-        console.log(user.email, " Singup sucessfully!")
-
+        console.log(user.email, " Register sucessfully!")
         const tokens = await this.getTokens(hashedData);
         return tokens;
     }
 
 
     async login(data: LoginDto) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: data.email,
-            },
-        });
+        const user = await this.usersService.findUserByEmail(data.email);
 
         if (!user) {
-            throw new Error('Email or password is incorrect');
+            throw new NotFoundException('Email is not founded');
         }
 
         const isPasswordValid = await bcrypt.compare(data.password, user.password);
         if( !isPasswordValid){
-            throw new Error('Email or password is incorrect');
+            throw new UnauthorizedException('Password is incorrect');
         }
         console.log(user.email, " Login sucessfully!")
-        const payload = { email: user.email, sub: user.id, roles: user.roles };
+        const payload = { email: user.email, sub: user.id, roles: user.role };
         const token = this.jwtService.sign(payload);
 
         return {
@@ -68,7 +65,7 @@ export class AuthService {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                roles: user.roles,
+                role: user.role,
             },
         };
     }

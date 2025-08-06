@@ -5,7 +5,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AtGuard } from './common/guards/auth.guards';
+import { AtGuard } from './auth/guard/auth.guards';
 import { EvnCheckMiddleware } from './common/midlleware/evn_check.midleware';
 
 
@@ -16,7 +16,8 @@ import { EvnCheckMiddleware } from './common/midlleware/evn_check.midleware';
     AuthModule,    
     ConfigModule.forRoot({
       isGlobal: true
-    }), PostsModule],
+    }), 
+    PostsModule],
   controllers: [],
   providers: [ PrismaService, AtGuard],
 })

@@ -1,8 +1,9 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { UserDto } from "../common/dto/userDto";
-import { LoginDto } from "../common/dto/LoginDto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { LoginDto } from "./dto/login-dto.ts";
+import { RegisterDto } from "./dto/register-dto";
+
 
 
 @ApiTags('Authentication Secion')
@@ -13,7 +14,7 @@ export class AuthController {
     @ApiOperation({summary:"Used to Register"})
     @Post("register")
     @HttpCode(HttpStatus.CREATED)
-    async register(@Body() data: UserDto) {
+    async register(@Body() data: RegisterDto) {
         return this.authService.register(data);
     }
 

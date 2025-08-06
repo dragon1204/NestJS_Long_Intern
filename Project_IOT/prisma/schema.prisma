@@ -23,17 +23,17 @@ model User {
   name  String?
   email String  @unique
   password String @default("")
-  roles Role[] 
+  role Role @default(USER)
   profile Profile?
   posts Post[]
 }
 
 model Profile {
   id Int @id @default(autoincrement())
-  UserID Int @unique
+  userID Int @unique
   bio String?
   avatar String?
-  user User @relation(fields: [UserID], references: [id])
+  user User @relation(fields: [userID], references: [id])
 }
 
 
@@ -41,6 +41,6 @@ model Post {
   id    Int    @id @default(autoincrement())
   title String
   content String?
-  UserID Int
-  user User @relation(fields: [UserID], references: [id])
+  userID Int
+  user User @relation(fields: [userID], references: [id])
 }

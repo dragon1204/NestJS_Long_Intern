@@ -2,11 +2,11 @@ import { Controller, Get, Post, Delete, Put, Patch, Param, Body, UseGuards } fro
 import { UsersService } from '../users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/common/decorator/roles.decorator';
-import { RolesGuard } from 'src/common/guards/roles.guards';
+import { RolesGuard } from 'src/auth/guard/roles.guards';
 import { Role } from '@prisma/client';
-import { AtGuard } from 'src/common/guards/auth.guards';
+import { AtGuard } from 'src/auth/guard/auth.guards';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserDto } from 'src/common/dto/userDto';
+import { UserDto } from 'src/users/dto/user-dto';
 
 @ApiTags('Users Section')
 @Controller('users')
@@ -16,7 +16,7 @@ export class UsersController {
 
     @ApiOperation({summary:"Used to get the list of users"})
     @Get("list")
-    @Roles(Role.ADMIN)
+    @Roles(Role.USER)
     async findAllUsers() {
         return this.usersService.findAllUsers();
     }

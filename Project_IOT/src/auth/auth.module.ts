@@ -4,9 +4,9 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { RolesGuard } from 'src/common/guards/roles.guards';
+import { RolesGuard } from 'src/auth/guard/roles.guards';
 import { JwtStrategy, RtStrategy } from './strategy';
-import { AtGuard } from 'src/common/guards/auth.guards';
+import { AtGuard } from 'src/auth/guard/auth.guards';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 
