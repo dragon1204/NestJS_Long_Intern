@@ -24,23 +24,48 @@ model User {
   email String  @unique
   password String @default("")
   role Role @default(USER)
-  profile Profile?
-  posts Post[]
+  gardens Garden[]
 }
 
-model Profile {
+model Vegetable {
   id Int @id @default(autoincrement())
-  userID Int @unique
-  bio String?
-  avatar String?
-  user User @relation(fields: [userID], references: [id])
+  name String
+  imported Int @default(0)
+  sold Int @default(0)
+  price Float @default(0)
+  gardenId Int
+  garden Garden @relation(fields: [gardenId], references: [id], onDelete: Cascade )
+  sales Sale[]
 }
 
 
-model Post {
+model Garden {
   id    Int    @id @default(autoincrement())
-  title String
+  name String
   content String?
-  userID Int
-  user User @relation(fields: [userID], references: [id])
+  ownerID Int
+  owner User @relation(fields: [ownerID], references: [id])
+  sales Sale[]
+  vegetables Vegetable[]
+  sensors SensorData[]
+}
+
+model Sale {
+  id Int @id @default(autoincrement())
+  quantity Int
+  total Float
+  time DateTime @default(now())
+  gardenId Int
+  vegetableId Int
+  garden Garden @relation(fields : [gardenId], references: [id], onDelete: Cascade)
+  vegetable Vegetable @relation(fields: [vegetableId], references: [id], onDelete: Cascade)
+}
+
+model SensorData {
+  id Int @id @default(autoincrement())
+  temperature Float
+  humidity Float
+  time DateTime @default(now())
+  gardenId Int
+  garden Garden @relation(fields: [gardenId], references: [id], onDelete: Cascade)
 }
