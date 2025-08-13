@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { VegetableService } from './vegetable.service';
 import { NewVegetableDto } from './dto/new-vegetable.dto';
 import { UpdatePriceDto } from './dto/update-price.dto';
@@ -32,5 +32,25 @@ export class VegetableController {
     @Put('update/sold/:id')
     async updateSold(@Param('id') id : number, @Body() dto : UpdateSoldDto){
         return await this.vegetableService.updateSold(id, dto);
+    }
+
+        // GET /price?type=day&gardenId=1
+    @Get('price')
+    async getPriceList(
+        @Query('type') type: 'day' | 'week' | 'month',
+        @Query('gardenId') gardenId?: string,
+        @Query('vegetableId') vegetableId?: string,
+    ) {
+        return this.vegetableService.getPriceList(type, gardenId ? Number(gardenId) : undefined, vegetableId ? Number(vegetableId) : undefined);
+    }
+
+    // GET /all/price?type=month
+    @Get('all/price')
+    async getTotalRevenue(
+        @Query('type') type: 'day' | 'week' | 'month',
+        @Query('gardenId') gardenId?: string,
+        @Query('vegetableId') vegetableId?: string,
+    ) {
+        return this.vegetableService.getTotalRevenue(type, gardenId ? Number(gardenId) : undefined, vegetableId ? Number(vegetableId) : undefined);
     }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewVegetableDto } from './dto/new-vegetable.dto';
 import { UpdatePriceDto } from './dto/update-price.dto';
@@ -10,7 +10,7 @@ export class VegetableService {
     constructor(private prisma : PrismaService){}
 
     async create(dto : NewVegetableDto){
-        this.prisma.vegetable.create({
+        await this.prisma.vegetable.create({
             data: {
                 name : dto.name,
                 gardenId : dto.gardenId,
@@ -18,7 +18,7 @@ export class VegetableService {
     }
 
     async findMany(){
-        this.prisma.vegetable.findMany()
+        await this.prisma.vegetable.findMany()
     }
 
     async updateImported(id : number,dto : UpdateImportedDto){
@@ -26,7 +26,7 @@ export class VegetableService {
         if(!exist) 
             throw new NotFoundException('không tồn tại id này');
 
-        return this.prisma.vegetable.update({
+        return await this.prisma.vegetable.update({
             where: {
                 id : id,
             },
@@ -57,7 +57,7 @@ export class VegetableService {
         if(!exist) 
             throw new NotFoundException('không tồn tại id này');
 
-        return this.prisma.vegetable.update({
+        return await this.prisma.vegetable.update({
             where: {
                 id : id,
             },
@@ -76,4 +76,43 @@ export class VegetableService {
         return true;
     }
 
+    private validateType(type: string) {
+    if (!['day', 'week', 'month'].includes(type)) {
+      throw new BadRequestException('Type must be one of: day, week, month');
+    }
+  }
+
+    async getPriceList(type: 'day' | 'week' | 'month', gardenId?: number, vegetableId?: number) {
+        this.validateType(type);
+
+        const where: any = {};
+        if (gardenId) where.gardenId = gardenId;
+        if (vegetableId) where.vegetableId = vegetableId;
+
+        return this.prisma.$queryRawUnsafe(`
+            SELECT 
+                DATE_TRUNC('${type}', "time") AS period,
+                SUM(total) AS totalRevenue,
+                SUM(quantity) AS totalQuantity
+            FROM "Sale"
+            ${Object.keys(where).length ? 'WHERE ' + Object.entries(where).map(([k, v]) => `"${k}" = ${v}`).join(' AND ') : ''}
+            GROUP BY period
+            ORDER BY period ASC
+        `);
+    }
+
+    async getTotalRevenue(type: 'day' | 'week' | 'month', gardenId?: number, vegetableId?: number) {
+        this.validateType(type);
+        const where: any = {};
+        if (gardenId) where.gardenId = gardenId;
+        if (vegetableId) where.vegetableId = vegetableId;
+
+    const result = await this.prisma.$queryRaw<{ totalRevenue: number }[]>`
+        SELECT SUM(total) as totalRevenue
+        FROM "Sale"
+        WHERE DATE(time) = CURRENT_DATE
+    `;  
+
+        return result[0] || { totalRevenue: 0 };
+    }
 }

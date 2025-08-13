@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import mqtt from 'mqtt/*';
-import { WebSocketGatewayService } from 'src/sensor/websocket/websocket.gateway';
+import * as mqtt from 'mqtt';
+import { WebSocketGatewayService } from '../websocket/websocket.gateway';
+
 
 
 
@@ -15,7 +16,7 @@ export class MqttService implements OnModuleInit{
 
         this.client.on('connect', () => {
             console.log("MQTT connected");
-            this.client.subscribe('sensor/data');
+            this.client.subscribe('humidity');
         });
 
         this.client.on('message', (topic, message) => {
