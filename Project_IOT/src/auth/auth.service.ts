@@ -3,10 +3,9 @@ import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as bcrypt from 'bcryptjs';
 import { Role } from "@prisma/client";
-import { UserDto } from "../users/dto/user-dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { LoginDto } from "./dto/login-dto.ts";
-import { RegisterDto } from "./dto/register-dto";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 
 
 

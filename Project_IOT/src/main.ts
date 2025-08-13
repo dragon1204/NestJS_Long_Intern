@@ -13,7 +13,7 @@ async function bootstrap() {
         .setTitle('The first NestJs project')
         .setDescription('The API description')
         .setVersion('1.0')
-        .addTag('User, Post, Profile')
+        .addTag('User, Garden, Vegatable, Sale')
         .build();
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, documentFactory);

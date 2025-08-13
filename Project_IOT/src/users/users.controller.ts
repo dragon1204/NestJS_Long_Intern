@@ -6,7 +6,7 @@ import { RolesGuard } from 'src/auth/guard/roles.guards';
 import { Role } from '@prisma/client';
 import { AtGuard } from 'src/auth/guard/auth.guards';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserDto } from 'src/users/dto/user-dto';
+import { UserDto } from 'src/users/dto/user.dto';
 
 @ApiTags('Users Section')
 @Controller('users')

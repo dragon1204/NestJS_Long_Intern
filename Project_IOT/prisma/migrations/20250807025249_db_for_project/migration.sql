@@ -35,6 +35,7 @@ CREATE TABLE "Garden" (
     "name" TEXT NOT NULL,
     "content" TEXT,
     "ownerID" INTEGER NOT NULL,
+    
 
     CONSTRAINT "Garden_pkey" PRIMARY KEY ("id")
 );

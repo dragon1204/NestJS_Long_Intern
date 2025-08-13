@@ -7,16 +7,12 @@ import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/guard/roles.guards';
 import { JwtStrategy, RtStrategy } from './strategy';
 import { AtGuard } from 'src/auth/guard/auth.guards';
-import { PrismaModule } from 'src/prisma/prisma.module';
-
-
 
 
 @Module({
     imports: [
         UsersModule, 
         PassportModule,
-        PrismaModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET,
             signOptions: {
@@ -25,7 +21,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, RtStrategy, RolesGuard, AtGuard],
+    providers: [AuthService, JwtStrategy],
     exports: [AuthService, JwtModule]
 })
 export class AuthModule {}

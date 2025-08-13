@@ -3,10 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
-import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AtGuard } from './auth/guard/auth.guards';
 import { EvnCheckMiddleware } from './common/midlleware/evn_check.midleware';
+import { GardenModule } from './garden/garden.module';
+import { VegetableModule } from './vegetable/vegetable.module';
+import { SaleModule } from './sale/sale.module';
+import { SensorModule } from './sensor/sensor.module';
 
 
 @Module({
@@ -17,9 +19,9 @@ import { EvnCheckMiddleware } from './common/midlleware/evn_check.midleware';
     ConfigModule.forRoot({
       isGlobal: true
     }), 
-    PostsModule],
+     GardenModule, VegetableModule, SaleModule, SensorModule],
   controllers: [],
-  providers: [ PrismaService, AtGuard],
+  providers: [ PrismaService],
 })
 
 export class AppModule implements NestModule{

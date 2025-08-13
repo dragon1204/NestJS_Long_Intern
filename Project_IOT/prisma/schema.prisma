@@ -42,9 +42,8 @@ model Vegetable {
 model Garden {
   id    Int    @id @default(autoincrement())
   name String
-  content String?
-  ownerID Int
-  owner User @relation(fields: [ownerID], references: [id])
+  ownerId Int
+  owner User @relation(fields: [ownerId], references: [id])
   sales Sale[]
   vegetables Vegetable[]
   sensors SensorData[]
