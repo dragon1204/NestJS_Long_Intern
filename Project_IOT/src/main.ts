@@ -3,12 +3,22 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { AllExceptionsFilter } from './common/midlleware/allExeptionFilter';
+import { AllExceptionsFilter } from './common/filters/all-exeption.filter';
+import { TransformResponseInterceptor } from './common/interceptor/transform-response.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    // Global Exception Filter
     app.useGlobalFilters(new AllExceptionsFilter());
+
+    // Global Response Interceptor
+    app.useGlobalInterceptors(new TransformResponseInterceptor)
+
+    // Config
     const configService = app.get(ConfigService)
+
+    // API Documentation Swagger
     const config = new DocumentBuilder()
         .setTitle('The first NestJs project')
         .setDescription('The API description')

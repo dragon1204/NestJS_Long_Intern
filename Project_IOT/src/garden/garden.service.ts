@@ -2,40 +2,41 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GardenDto } from './dto/garden.dto';
 import { RoleUserDto } from 'src/users/dto/role-user.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class GardenService {
     constructor(private prisma: PrismaService){}
 
-    async create(userId : number, dto: GardenDto){
+    async create(userId : number, payload: GardenDto){
         return this.prisma.garden.create({
             data: {
-                name: dto.name,
+                name: payload.name,
                 ownerId: userId
             }
         })
     }
 
-    async findMany(dto: RoleUserDto){
-        if(dto.role === 'ADMIN'){
+
+    async findMany(userId : number, userRole : string, skip?: number, take?: number){
+        const include: any = {
+            vegetables: true,
+            sales: true,
+            sensors: true,
+        };
+            const where =  userRole === Role.ADMIN ? undefined : { ownerId: userId}
+        if(userRole === Role.ADMIN){
             return this.prisma.garden.findMany({
                 include: {
                     owner: true,
-                    vegetables: true,
-                    sales: true,
-                    sensors: true,
                 },
             });
         }
         return this.prisma.garden.findMany({
-            where: {
-                ownerId: dto.id,
-            },
-            include: {
-                vegetables: true,
-                sales: true,
-                sensors: true,
-            },
+            where,
+            include,
+            skip : skip ?? 0,
+            take : take ?? 0,
         });
         
     }
@@ -51,7 +52,7 @@ export class GardenService {
             throw new NotFoundException('Garden not found');
         }
 
-        if(user.role === 'ADMIN' || garden.ownerId === user.id) {
+        if(user.role === Role.ADMIN || garden.ownerId === user.id) {
             return garden;
         }
 
@@ -70,7 +71,7 @@ export class GardenService {
             throw new NotFoundException('Garden not found');
         }
 
-        if(user.role === 'ADMIN' || garden.ownerId === user.id) {
+        if(user.role === Role.ADMIN || garden.ownerId === user.id) {
             return this.prisma.garden.update({
                 where: { id : gardenId },
                 data: {
@@ -93,7 +94,6 @@ export class GardenService {
         }
 
         await this.prisma.garden.delete({where: {id : gardenId}});
-
     }
 
     async checkValidId(id : number){

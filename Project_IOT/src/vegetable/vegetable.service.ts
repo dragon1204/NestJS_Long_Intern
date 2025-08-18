@@ -7,80 +7,87 @@ import { UpdateSoldDto } from './dto/update-sold.dto';
 
 @Injectable()
 export class VegetableService {
-    constructor(private prisma : PrismaService){}
+    constructor(private prisma: PrismaService) { }
 
-    async create(dto : NewVegetableDto){
+    async create(payload: NewVegetableDto) {
         await this.prisma.vegetable.create({
             data: {
-                name : dto.name,
-                gardenId : dto.gardenId,
-        }})
-    }
-
-    async findMany(){
-        await this.prisma.vegetable.findMany()
-    }
-
-    async updateImported(id : number,dto : UpdateImportedDto){
-        const exist = await this.checkExist(id);
-        if(!exist) 
-            throw new NotFoundException('không tồn tại id này');
-
-        return await this.prisma.vegetable.update({
-            where: {
-                id : id,
-            },
-            data: {
-                imported : dto.imported,
+                name: payload.name,
+                imported: payload.imported ?? 0,
+                sold: payload.sold ?? 0,
+                price: payload.price ?? 0
             }
         })
     }
 
-    async updateSold(id : number, dto : UpdateSoldDto){
+    async findMany(skip?: number, take?: number) {
+        await this.prisma.vegetable.findMany({
+            skip: skip ?? 0,
+            take: take ?? 10,
+            orderBy: {id: 'asc'}
+        })
+    }
+
+    async updateImported(id: number, dto: UpdateImportedDto) {
         const exist = await this.checkExist(id);
-        if(!exist) 
+        if (!exist)
+            throw new NotFoundException('không tồn tại id này');
+
+        return await this.prisma.vegetable.update({
+            where: {
+                id: id,
+            },
+            data: {
+                imported: dto.imported,
+            }
+        })
+    }
+
+    async updateSold(id: number, dto: UpdateSoldDto) {
+        const exist = await this.checkExist(id);
+        if (!exist)
             throw new NotFoundException('không tồn tại id này');
 
         return this.prisma.vegetable.update({
             where: {
-                id : id,
+                id: id,
             },
             data: {
-                sold : dto.sold,
+                sold: dto.sold,
             }
         })
     }
 
 
-    async updatePrice(id : number, dto : UpdatePriceDto){
+    async updatePrice(id: number, dto: UpdatePriceDto) {
         const exist = await this.checkExist(id);
-        if(!exist) 
+        if (!exist)
             throw new NotFoundException('không tồn tại id này');
 
         return await this.prisma.vegetable.update({
             where: {
-                id : id,
+                id: id,
             },
             data: {
-                price : dto.price,
+                price: dto.price,
             }
         })
     }
 
 
 
-    async checkExist(id : number) { 
-        const isExist = await this.prisma.vegetable.findUnique({where : {id : id}});
-        if(!isExist)
+    async checkExist(id: number) {
+        const isExist = await this.prisma.vegetable.findUnique({ where: { id: id } });
+        if (!isExist)
             return false;
         return true;
     }
 
     private validateType(type: string) {
-    if (!['day', 'week', 'month'].includes(type)) {
-      throw new BadRequestException('Type must be one of: day, week, month');
+        if (!['day', 'week', 'month'].includes(type)) {
+            throw new BadRequestException('Type must be one of: day, week, month');
+        }
     }
-  }
 
     async getPriceList(type: 'day' | 'week' | 'month', gardenId?: number, vegetableId?: number) {
         this.validateType(type);
@@ -107,11 +114,11 @@ export class VegetableService {
         if (gardenId) where.gardenId = gardenId;
         if (vegetableId) where.vegetableId = vegetableId;
 
-    const result = await this.prisma.$queryRaw<{ totalRevenue: number }[]>`
+        const result = await this.prisma.$queryRaw<{ totalRevenue: number }[]>`
         SELECT SUM(total) as totalRevenue
         FROM "Sale"
         WHERE DATE(time) = CURRENT_DATE
-    `;  
+    `;
 
         return result[0] || { totalRevenue: 0 };
     }

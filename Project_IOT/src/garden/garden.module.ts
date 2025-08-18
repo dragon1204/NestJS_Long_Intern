@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { GardenController } from './garden.controller';
+import { AdminGardenController } from './controler/admin.garden.controller';
 import { GardenService } from './garden.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { UserGardenController } from './controler/user.garden.controler';
 
 @Module({
-  controllers: [GardenController],
+  controllers: [AdminGardenController, UserGardenController],
   providers: [GardenService]
 })
 export class GardenModule {}

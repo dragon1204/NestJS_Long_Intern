@@ -5,5 +5,11 @@ export class NewVegetableDto{
     name : string;
 
     @IsNumber()
-    gardenId : number;
+    imported ?: number
+
+    @IsNumber()
+    sold ?: number
+
+    @IsNumber()
+    price ? : number
 }

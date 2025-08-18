@@ -4,7 +4,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { EvnCheckMiddleware } from './common/midlleware/evn_check.midleware';
+import { EvnCheckMiddleware } from './common/midllewares/evn_check.midleware';
 import { GardenModule } from './garden/garden.module';
 import { VegetableModule } from './vegetable/vegetable.module';
 import { SaleModule } from './sale/sale.module';
