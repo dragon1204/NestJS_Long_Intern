@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as mqtt from 'mqtt';
-import { WebSocketGatewayService } from '../websocket/websocket.gateway';
+import { WsGateway } from '../websocket/websocket.gateway';
+
 
 
 
@@ -9,21 +10,29 @@ import { WebSocketGatewayService } from '../websocket/websocket.gateway';
 export class MqttService implements OnModuleInit{
     private client : mqtt.MqttClient;
 
-    constructor(private readonly wsGateway : WebSocketGatewayService){}
+    constructor(private readonly wsGateway : WsGateway){}
 
     onModuleInit() {
         this.client = mqtt.connect('mqtt://broker.hivemq.com:1883');
 
         this.client.on('connect', () => {
             console.log("MQTT connected");
-            this.client.subscribe('humidity');
+            this.client.subscribe(['humidity', 'temperature']);
         });
 
         this.client.on('message', (topic, message) => {
             const payload = message.toString();
-            console.log(`MQTT recieves: ${payload}`);
+            if(topic === 'humidity') {
+                console.log('Humidity:', payload);
+                this.wsGateway.sendData( 'humidity', payload);
+            }
 
-            this.wsGateway.sendData(payload);
+            if(topic === 'temperature') {
+                console.log('Temperature:', payload);
+                this.wsGateway.sendData( 'temperature', payload);
+            }
+
+
         })
 
 

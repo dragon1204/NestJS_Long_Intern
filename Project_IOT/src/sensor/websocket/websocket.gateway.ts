@@ -1,8 +1,9 @@
 import { WebSocketGateway, WebSocketServer, OnGatewayConnection } from '@nestjs/websockets';
-import { Server } from 'ws';
+import { Server } from 'socket.io';
 
-@WebSocketGateway({ path: '/', cors: { origin: '*' }, transports: ['websocket'] })
-export class WebSocketGatewayService implements OnGatewayConnection {
+@WebSocketGateway({ cors: { origin: '*' } })
+
+export class WsGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -10,11 +11,7 @@ export class WebSocketGatewayService implements OnGatewayConnection {
     console.log('Client connected');
   }
 
-  sendData(data: any) {
-    this.server.clients.forEach((client) => {
-      if (client.readyState === 1) {
-        client.send(JSON.stringify({ event: 'sensorUpdate', data }));
-      }
-    });
+  sendData(event: string, data: any) {
+    this.server.emit(event, data);
   }
 }

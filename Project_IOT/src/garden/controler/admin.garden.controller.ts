@@ -50,7 +50,7 @@ export class AdminGardenController {
     }
 
     @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Delete('delete/:id')
+    @Delete('/:id')
     async delete(@Param('id') id : number){
         return this.gardenService.delete(id);
     }
