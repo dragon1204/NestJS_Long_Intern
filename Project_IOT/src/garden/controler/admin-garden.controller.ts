@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { AtGuard } from 'src/auth/guard/auth.guards';
 import { RolesGuard } from 'src/auth/guard/roles.guards';
 import { GardenService } from '../garden.service';
@@ -9,16 +9,16 @@ import { ApiOperation } from '@nestjs/swagger';
 
 
 
-@Controller('garden')
+@Controller('garden/admin')
 @UseGuards(AtGuard, RolesGuard)
-export class UserGardenController {
+@Roles(Role.ADMIN)
+export class AdminGardenController {
     constructor(private readonly gardenService : GardenService){}
 
     @ApiOperation({ summary: "Used to create a garden" })
     @Post('')
-    async createGarden(@Req() Req, @Body() dto: GardenDto){
-        const user = Req.user;
-        return this.gardenService.create(user.id, dto);
+    async createGarden(@Query() userId : number, @Body() dto: GardenDto){
+        return this.gardenService.create(userId, dto);
     }
 
     @ApiOperation({ summary: "Used to get the list of the garden" })
@@ -41,7 +41,7 @@ export class UserGardenController {
         return this.gardenService.update(garden, id, req.user);
     }
 
-    @Roles(Role.ADMIN)
+
     @ApiOperation({ summary: "Used to delete the garden by id" })
     @Delete('/:id')
     async delete(@Param('id') id : number){

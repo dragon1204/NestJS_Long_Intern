@@ -9,10 +9,21 @@ export class GardenService {
     constructor(private prisma: PrismaService){}
 
     async create(userId : number, payload: GardenDto){
-        return this.prisma.garden.create({
+        return await this.prisma.garden.create({
             data: {
                 name: payload.name,
                 ownerId: userId
+            }
+        })
+    }
+
+    async createOwnGarden(userId : number, payload: GardenDto) {
+        return await this.prisma.garden.create({
+            data: {
+                name: payload.name,
+                owner: {   
+                    connect: { id : userId }  
+                }     
             }
         })
     }
@@ -26,13 +37,13 @@ export class GardenService {
         };
             const where =  userRole === Role.ADMIN ? undefined : { ownerId: userId}
         if(userRole === Role.ADMIN){
-            return this.prisma.garden.findMany({
+            return await this.prisma.garden.findMany({
                 include: {
                     owner: true,
                 },
             });
         }
-        return this.prisma.garden.findMany({
+        return await this.prisma.garden.findMany({
             where,
             include,
             skip : skip ?? 0,
@@ -72,7 +83,7 @@ export class GardenService {
         }
 
         if(user.role === Role.ADMIN || garden.ownerId === user.id) {
-            return this.prisma.garden.update({
+            return await this.prisma.garden.update({
                 where: { id : gardenId },
                 data: {
                     name: gardenDto.name,

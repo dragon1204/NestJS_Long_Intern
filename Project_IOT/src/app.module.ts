@@ -7,7 +7,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { EvnCheckMiddleware } from './common/midllewares/evn_check.midleware';
 import { GardenModule } from './garden/garden.module';
 import { VegetableModule } from './vegetable/vegetable.module';
-import { SaleModule } from './sale/sale.module';
 import { SensorModule } from './sensor/sensor.module';
 
 
@@ -19,7 +18,7 @@ import { SensorModule } from './sensor/sensor.module';
     ConfigModule.forRoot({
       isGlobal: true
     }), 
-     GardenModule, VegetableModule, SaleModule, SensorModule],
+     GardenModule, VegetableModule, SensorModule],
   controllers: [],
   providers: [ PrismaService],
 })

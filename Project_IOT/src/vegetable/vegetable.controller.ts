@@ -5,6 +5,9 @@ import { UpdatePriceDto } from './dto/update-price.dto';
 import { UpdateImportedDto } from './dto/update-imported.dto';
 import { UpdateSoldDto } from './dto/update-sold.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { FindVegetableDto } from './dto/find-vegetable.dto';
+import { RevenueVegetableDto } from './dto/revenue-vegetable.dto';
+
 
 @Controller('vegetable')
 export class VegetableController {
@@ -18,11 +21,8 @@ export class VegetableController {
 
     @ApiOperation({ summary: "Used to show the list vegetable" })
     @Get('')
-    async findAll(
-        @Query('skip') skip : number,
-        @Query('take') take : number
-    ) {
-        return await this.vegetableService.findMany(skip, take);
+    async findAll(@Query() findManyDto: FindVegetableDto) {
+        return await this.vegetableService.findMany(findManyDto.skip, findManyDto.take);
     }
 
     @ApiOperation({ summary: "Used to change the price of vegetable" })
@@ -43,23 +43,23 @@ export class VegetableController {
         return await this.vegetableService.updateSold(id, dto);
     }
 
-    @ApiOperation({ summary: "Used to get the revenue vegetable " })
-    @Get('revenue')
-    async getPriceList(
-        @Query('type') type: 'day' | 'week' | 'month',
-        @Query('gardenId') gardenId?: string,
-        @Query('vegetableId') vegetableId?: string,
-    ) {
-        return this.vegetableService.getPriceList(type, gardenId ? Number(gardenId) : undefined, vegetableId ? Number(vegetableId) : undefined);
+    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
+    @Get('revenue/all')
+    async getPriceList(@Query() query: RevenueVegetableDto) {
+        return this.vegetableService.getPriceList(
+            query.type,
+            query.gardenId ? Number(query.gardenId) : undefined,
+            query.vegetableId ? Number(query.vegetableId) : undefined,
+        );
     }
 
     @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Get('all/revenue')
-    async getTotalRevenue(
-        @Query('type') type: 'day' | 'week' | 'month',
-        @Query('gardenId') gardenId?: string,
-        @Query('vegetableId') vegetableId?: string,
-    ) {
-        return this.vegetableService.getTotalRevenue(type, gardenId ? Number(gardenId) : undefined, vegetableId ? Number(vegetableId) : undefined);
+    @Get('revenue/all')
+    async getTotalRevenue(@Query() query: RevenueVegetableDto) {
+        return this.vegetableService.getTotalRevenue(
+            query.type,
+            query.gardenId ? Number(query.gardenId) : undefined,
+            query.vegetableId ? Number(query.vegetableId) : undefined,
+        );
     }
 }

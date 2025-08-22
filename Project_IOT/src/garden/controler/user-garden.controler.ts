@@ -10,46 +10,39 @@ import { ApiOperation } from '@nestjs/swagger';
 
 
 @Controller('garden')
-@UseGuards(AtGuard)
-export class AdminGardenController {
+@UseGuards(AtGuard, RolesGuard)
+export class UserGardenController {
     constructor(private readonly gardenService : GardenService){}
 
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Post('admin/create')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    async AdminCreateGarden(userId : number, @Body() dto: GardenDto){
-        return this.gardenService.create(userId, dto);
-    }
-
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
+    @ApiOperation({ summary: "Used to create a garden" })
     @Post('')
     async createGarden(@Req() Req, @Body() dto: GardenDto){
         const user = Req.user;
-        return this.gardenService.create(user.id, dto);
+        return this.gardenService.createOwnGarden(user.id, dto);
     }
 
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Get('list')
+    @ApiOperation({ summary: "Used to get the list of the garden" })
+    @Get('')
     async findMany(@Req() req){
         const user = req.user as {id: number; role:string}
         return this.gardenService.findMany(user.id, user.role);
     }
 
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Get('detail/:id')
+    @ApiOperation({ summary: "Used to get the detail of the garden" })
+    @Get('/:id')
     async checkDetail(@Req() req, @Param('id') id : number){
         const user = req.user as {id : number; role: string};
         return this.gardenService.showDetail(user, id);
     }
 
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
-    @Put('update/:id')
+    @ApiOperation({ summary: "Used to update the detail of the garden" })
+    @Put('/:id')
     async updateGarden(@Body() garden: GardenDto, @Param('id') id : number,@Req() req ){
         return this.gardenService.update(garden, id, req.user);
     }
 
-    @ApiOperation({ summary: "Used to get the total revenue vegetable" })
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "Used to delete the garden by id" })
     @Delete('/:id')
     async delete(@Param('id') id : number){
         return this.gardenService.delete(id);
