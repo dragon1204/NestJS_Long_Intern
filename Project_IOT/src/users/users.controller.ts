@@ -21,14 +21,14 @@ export class UsersController {
     }
 
     @ApiOperation({summary:"Used to find a user by Id"})
-    @Get(":id")
+    @Get("/:id")
     @Roles(Role.USER)
     async findUserById(@Param('id') id: string) {
         return this.usersService.findUserById(+id);
     }     
     
     @ApiOperation({summary:"Used to find a user by email"})
-    @Get(":email")
+    @Get("/:email")
     async findUserByEmail(@Param('email') email: string) {
         return this.usersService.findUserByEmail(email);
     } 
@@ -41,14 +41,14 @@ export class UsersController {
     }   
 
     @ApiOperation({summary:"Used to update a user with Id"})
-    @Put(":id")
+    @Put("/:id")
     @Roles(Role.ADMIN)
     async updateUser(@Param('id') id: string, @Body() userData: UserDto) {
         return this.usersService.updateUser(+id, userData);
     }       
 
     @ApiOperation({summary:"Used to delete a user with Id"})
-    @Delete(":id")
+    @Delete("/:id")
     @Roles(Role.ADMIN)
     async deleteUser(@Param('id') id: string) {
         return this.usersService.deleteUser(+id);
