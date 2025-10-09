@@ -3,10 +3,10 @@ import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as bcrypt from 'bcryptjs';
 import { Role } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-
+import { ConfigService } from "@nestjs/config";
+import { TokenDto } from "./dto/token.dto";
 
 
 @Injectable()
@@ -14,77 +14,75 @@ export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
-        private prisma: PrismaService, // Assuming you meant to use PrismaService here
+        private configService: ConfigService
     ) {}
     
- 
 
     async register(data: RegisterDto) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        const hashedData = {
-            email: data.email,
-            password: hashedPassword,
-            name: data.name,
-            role: data.role ?? Role.USER, // Default to USER role if not provided
-        }
 
         const  user = await this.usersService.createUser(
             {
-                email: data.email,
+                ...data,
                 password: hashedPassword,
-                name: data.name,
                 role: data.role ?? Role.USER , // Default to USER role if not provided
             }
         );
 
         console.log(user.email, " Register sucessfully!")
-        const tokens = await this.getTokens(hashedData);
-        return tokens;
+        return user;
     }
 
 
-    async login(data: LoginDto) {
-        const user = await this.usersService.findUserByEmail(data.email);
+    async login(loginData: LoginDto) {
+        const user = await this.usersService.findUserByEmail(loginData.email);
 
         if (!user) {
             throw new NotFoundException('Email is not founded');
         }
 
-        const isPasswordValid = await bcrypt.compare(data.password, user.password);
+        const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
         if( !isPasswordValid){
             throw new UnauthorizedException('Password is incorrect');
         }
         console.log(user.email, " Login sucessfully!")
-        const payload = { email: user.email, sub: user.id, roles: user.role };
-        const token = this.jwtService.sign(payload);
 
-        return {
-            access_token: token,
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            },
-        };
+        const payload = {
+            id : user.id,
+            name: user.name,
+            email: user.email,
+            role : user.role
+        }
+
+        const tokens = await this.getTokens(payload);
+
+        return tokens;
     }
 
-    // async logout(userId: number){
-    //     await this.prisma.user.updateMany({
-    //         where: {
-    //             id: userId,
-    //             hashedRt : {
-    //                 not: null,
-    //             },
-    //         },
-    //         data: {
-    //             hashedRt: null,
-    //         }
-    //     })
-    //     return true;
-    // }
 
-    async refreshTokens(){}
+
+    async refreshTokens(refresh_token : string){
+        const refresh_secret = this.configService.get<string>("REFRESH_SECRET");
+        try{
+            const payload = await this.jwtService.verifyAsync(refresh_token, {
+                secret : refresh_secret,
+            })
+            
+            const tokenDto = {
+                id : payload.id,
+                name : payload.name, 
+                email : payload.email, 
+                role : payload.role
+            }
+
+            console.log(tokenDto)
+
+            return this.getTokens(tokenDto);
+
+        } catch {
+            throw new UnauthorizedException("Invalid refresh token")
+        }
+    }
 
     // async updateRtHash(userId: number, rt: string): Promise<void> {
     //     const hash = await argon.hash(rt);
@@ -98,26 +96,26 @@ export class AuthService {
     //      });
     // }
 
-    async getTokens(payload: any){
+    async getTokens(payload: TokenDto){
         const [at, rt] = await Promise.all([
             this.jwtService.signAsync(
                 payload, 
                 {
-                    expiresIn: 60 * 15,
-                    secret: process.env.JWT_SECRET,
+                    expiresIn: 30,
+                    secret: this.configService.get<string>("JWT_SECRET"),
                 },
             ),
             this.jwtService.signAsync(
                 payload, 
                 {
                     expiresIn: '7d',
-                    secret: process.env.REFRESH_SECRET,
+                    secret: this.configService.get<string>("REFRESH_SECRET"),
                 },
             ),
         ]);
 
         return {
-            acess_token: at,
+            access_token: at,
             refresh_token: rt,
         }
     }

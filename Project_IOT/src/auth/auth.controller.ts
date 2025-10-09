@@ -31,10 +31,11 @@ export class AuthController {
     //     return this.authService.logout();
     // }
 
-    // @Post("refresh")
-    // refreshTokens(){
-    //     return this.authService.refreshTokens();
-    // }
+    @ApiOperation({summary:"Used to refresh the JWT"})
+    @Post("refresh")
+    refreshTokens(@Body("refresh_token") refreshToken : string){
+        return this.authService.refreshTokens(refreshToken);
+    }
 
 }
 
